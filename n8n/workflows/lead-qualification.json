@@ -1,5 +1,5 @@
 {
-  "name": "EstateFlow — Lead qualification",
+  "name": "EstateFlow — Lead capture and qualification",
   "nodes": [
     {
       "parameters": {
@@ -16,22 +16,20 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.CRM_API_URL }}/api/automations/qualify",
+        "url": "={{ $env.CRM_API_URL }}/api/leads",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "X-Workflow-Secret", "value": "={{ $env.CRM_WORKFLOW_SECRET }}" },
-            { "name": "Idempotency-Key", "value": "={{ $json.idempotencyKey }}" }
+            { "name": "X-CRM-Webhook-Secret", "value": "={{ $env.CRM_WORKFLOW_SECRET }}" }
           ]
         },
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify($json) }}",
-        "options": {}
+        "body": "={{ JSON.stringify($json.body ?? $json) }}"
       },
-      "id": "qualify",
-      "name": "Qualify and Assign",
+      "id": "capture",
+      "name": "Capture Qualify Assign",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [240, 0]
@@ -46,10 +44,10 @@
     }
   ],
   "connections": {
-    "New Lead Webhook": { "main": [[{ "node": "Qualify and Assign", "type": "main", "index": 0 }]] },
-    "Qualify and Assign": { "main": [[{ "node": "Return Result", "type": "main", "index": 0 }]] }
+    "New Lead Webhook": { "main": [[{ "node": "Capture Qualify Assign", "type": "main", "index": 0 }]] },
+    "Capture Qualify Assign": { "main": [[{ "node": "Return Result", "type": "main", "index": 0 }]] }
   },
-  "settings": { "executionOrder": "v1", "saveDataErrorExecution": "all" },
+  "settings": { "executionOrder": "v1", "saveDataErrorExecution": "all", "saveDataSuccessExecution": "none" },
   "active": false,
-  "versionId": "estateflow-lead-qualification-v1"
+  "versionId": "estateflow-lead-capture-v2"
 }
