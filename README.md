@@ -19,7 +19,7 @@ Capture every lead. Qualify instantly. Follow up intelligently. Close more deals
 
 </div>
 
-![EstateFlow dashboard overview](docs/screenshots/dashboard-overview.png)
+![EstateFlow AI — Real estate leads qualified, routed and converted](docs/screenshots/estateflow-hero.png)
 
 ## The product
 
@@ -43,6 +43,8 @@ Every outbound message stays in a human-approval queue. Every important action b
 | No visibility into conversion | Source, pipeline and conversion dashboards |
 
 ## Product tour
+
+![EstateFlow dashboard overview](docs/screenshots/dashboard-overview.png)
 
 <table>
   <tr>
