@@ -1,0 +1,41 @@
+name: Quality checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Verify Vercel build
+        run: npm run build:vercel
+
+      - name: Validate n8n workflow JSON
+        shell: pwsh
+        run: |
+          Get-ChildItem n8n/workflows/*.json |
+            ForEach-Object { Get-Content -Raw $_.FullName | ConvertFrom-Json | Out-Null }

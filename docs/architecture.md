@@ -1,27 +1,34 @@
-# Architecture
+# EstateFlow architecture
 
-EstateFlow separates intake, business logic, automation and delivery.
+EstateFlow separates channel intake, business logic, durable data, human approval and automation delivery.
 
-```text
-Channels → Webhook gateway → CRM API → Database
-                              ↓
-                         LLM service
-                              ↓
-                      Approval outbox
-                              ↓
-                    n8n → Channel API
+```mermaid
+flowchart LR
+  Channels["Website · WhatsApp · Facebook"] --> Gateway["Signed webhook gateway"]
+  Gateway --> CRM["CRM automation API"]
+  CRM --> Database[("Supabase Postgres + RLS")]
+  CRM --> Outbox["Human approval outbox"]
+  Outbox --> n8n["n8n orchestration"]
+  n8n --> ChannelAPI["Approved channel API"]
+  n8n -. failure .-> Retry["Retry queue"]
+  Retry --> n8n
 ```
 
 ## Design decisions
 
 - Incoming channel payloads are normalized before entering the domain model.
-- Duplicate detection runs before expensive AI calls.
-- AI output is validated against a JSON schema.
-- Assignment uses deterministic rules with round-robin fallback.
-- Sending is an outbox operation and never happens inside generation.
-- Timeline records are append-only.
-- Retries reuse an idempotency key and cannot create duplicate messages.
+- Duplicate detection runs before qualification and assignment.
+- Qualification is deterministic and explainable in the free showcase.
+- Assignment uses explicit rules with workload-based fallback.
+- Generation and sending are separate operations.
+- Outbound drafts require human approval.
+- Timeline records provide a complete audit trail.
+- Workflow calls use unique idempotency keys.
+- Secrets never enter the browser bundle or repository.
 
-## Production services
+## Deployment boundaries
 
-The deployable showcase uses Cloudflare-compatible storage. The full service target uses Supabase Auth/Postgres with row-level security, a TypeScript API and n8n orchestration. AWS can host the frontend, API containers, secrets and observability without replacing the database layer.
+- Vercel serves the static React interface and Node.js API functions.
+- Supabase provides authentication, Postgres, RLS and realtime events.
+- n8n Community Edition runs from the checked-in Docker Compose definition.
+- WhatsApp/Facebook channel credentials are optional and remain inside n8n.
