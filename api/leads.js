@@ -4,8 +4,11 @@ import { chooseAgent, findDuplicate, followUpDraft, nextFollowUp, normalizeLead,
 
 export const config = { runtime: "nodejs" };
 
-export default async function handler(request) {
-  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+export function GET() {
+  return json({ service: "EstateFlow lead automation", status: "ready" });
+}
+
+export async function POST(request) {
   try {
     requireWebhookSecret(request);
     const supabase = getSupabaseAdmin();

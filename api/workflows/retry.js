@@ -3,8 +3,7 @@ import { handleError, HttpError, json, readJson } from "../_lib/http.js";
 
 export const config = { runtime: "nodejs" };
 
-export default async function handler(request) {
-  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+export async function POST(request) {
   try {
     await assertAdmin(request);
     const { workflow_run_id: id } = await readJson(request);
